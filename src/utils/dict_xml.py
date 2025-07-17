@@ -1,7 +1,6 @@
 import re
 import logging
 from typing import Dict, Any
-from pprint import pformat
 
 from lxml import etree
 
@@ -124,7 +123,7 @@ def validate_xml(xml_path, xsd_dir):
 
     # verification
     schema.assertValid(xml_file)
-    logging.debug("xml verification successful")
+    logging.info("XML validation successful.")
 
 
 def generate_and_validate_ipxact(
@@ -133,8 +132,6 @@ def generate_and_validate_ipxact(
     """Generates and validates the IP-XACT XML file."""
     logging.info(f"Generating IP-XACT XML file at '{output_path}'...")
     component_dict = component.model_dump(exclude_none=True, by_alias=True)
-    logging.debug(f"Final component dictionary:\n{pformat(component_dict)}")
-
     try:
         xml_output = create_ipxact_xml(component_data=component_dict, **xml_config)
         with open(output_path, "w", encoding="utf-8") as f:
@@ -147,6 +144,5 @@ def generate_and_validate_ipxact(
         if not ipxact_schema_version:
             raise Exception
         validate_xml(output_path, str(ipxact_schema_version[0]))
-        logging.info("XML validation successful.")
     except Exception as e:
         logging.critical(f"Failed to create or validate XML file: {e}")

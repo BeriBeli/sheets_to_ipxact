@@ -21,13 +21,14 @@ from utils.parser import (
 from utils.dict_xml import generate_and_validate_ipxact
 
 # configuration constrants
-DEBUG = False
+DEBUG = 1
 LOG_FILE = "debug.log"
 CONFIG_FILE = "config/common.toml"
 DEFAULT_EXCEL_NAME = "example.xlsx"
 DEFAULT_VENDOR_SHEET = "vendor"
 DEFAULT_ADDRESS_SHEET = "address_map"
 DEFAULT_OUTPUT_XML = "example.xml"
+DEFAULT_OUTPUT_JSON = "debug.json"
 DEFAULT_IPXACT_CONFIG = {
     "root_tag": "component",
     "ns_map": {
@@ -47,7 +48,7 @@ def setup_logging(debug: bool):
     level = logging.DEBUG if debug else logging.INFO
     logging.basicConfig(
         level=level,
-        format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s",
+        format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d]\n %(message)s",
         filename=LOG_FILE,
         filemode="w",
     )
@@ -113,6 +114,7 @@ def main():
     vendor_sheet = config.get("vendor_sheet", DEFAULT_VENDOR_SHEET)
     address_sheet = config.get("address_sheet", DEFAULT_ADDRESS_SHEET)
     xml_header = config.get("xml_header")
+    debug_json = DEFAULT_OUTPUT_JSON
 
     logging.debug(config)
 
@@ -164,6 +166,17 @@ def main():
 
     memory_map = MemoryMap(name=component.name, address_block=address_blocks)
     component.memory_maps = MemoryMaps(memory_map=[memory_map])
+    
+    if args.debug:
+        try:
+            with open(debug_json, "w") as f:
+                f.write(
+                    component.model_dump_json(
+                        exclude_none=True, by_alias=True, indent=2
+                    )
+                )
+        except Exception as e:
+            logging.error(f"Failed to write {debug_json}: {e}")
 
     generate_and_validate_ipxact(component, xml_path, xml_header)
 
