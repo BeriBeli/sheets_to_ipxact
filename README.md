@@ -1,6 +1,6 @@
 # Sheets to IP-XACT
 
-This is a Python script designed to convert register description spreadsheets in a specific format into IP-XACT XML files. The spreadsheet file `example.xlsx` is provided as an example in specific format.
+This is a Python script designed to convert register description spreadsheets in a specific format into IP-XACT XML files. see `example.xlsx` for an example.
 
 ## Key Features
 
@@ -19,7 +19,27 @@ This is a Python script designed to convert register description spreadsheets in
 
 ### Configuration
 
-see examples in `config/common.toml`. TOML currently has **higher priority** than args, to make script command execution simpler.
+see examples in `config/common.toml`. 
+```toml
+# spreadsheet path, also can be specified in args
+excel_name = "demo.xlsx"
+# the path of the output xml file, also can be specified in args
+xml_name = "example.xml"
+# the name of the sheet about vendor and version information
+vendor_sheet = "version"
+# the name of the sheet giving an address map of the system
+address_sheet = "address_map"
+
+# ipxact xml header
+[xml_header]
+root_tag = "component"
+schema_location = "http://www.accellera.org/XMLSchema/IPXACT/1685-2014 http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd"
+default_ns_prefix = "ipxact"
+
+[xml_header.ns_map]
+ipxact = "http://www.accellera.org/XMLSchema/IPXACT/1685-2014"
+xsi = "http://www.w3.org/2001/XMLSchema-instance"
+```
 
 ### Installation and Execution
 
