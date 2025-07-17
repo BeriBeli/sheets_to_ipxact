@@ -2,8 +2,6 @@
 
 This is a Python script designed to convert register description spreadsheets in a specific format into IP-XACT XML files. The spreadsheet file `example.xlsx` is provided as an example in specific format.
 
-The project utilizes the `polars` library for efficient Spreadsheet data processing and employs `xsdata` to generate corresponding `pydantic` `BaseModel` classes based on the IP-XACT standard for data handling.
-
 ## Key Features
 
 - **Efficient Processing**: Uses the [Polars](https://www.pola.rs/) library to provide fast DataFrame operations for large datasets.
@@ -52,10 +50,11 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 3. **Run the script:**
 
    ```shell
-   # Linux/macOS  
+   sheets_to_ipxact
+   ```
+   or
+   ```shell
    python -u src/main.py
-   # Windows
-   python -u src\main.py
    ```
 
 #### Method 2: Using `uv`
@@ -78,17 +77,20 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 2. **Sync dependencies:**
 
    ```shell
-   uv sync  
+   uv sync
+   uv pip install -e .
    ```
 
 3. **Run the script:**
 
    ```shell
-   # Linux/macOS  
-   uv run src/main.py  
-   # Windows
-   uv run src\main.py
+   sheets_to_ipxact
    ```
+   or
+   ```shell
+   uv run src/main.py
+   ```
+
 
 ## Warning
 1. Not All IP-XACT standard implemented by `schema.py`
