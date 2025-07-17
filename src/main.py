@@ -21,11 +21,11 @@ from utils.parser import (
 from utils.dict_xml import generate_and_validate_ipxact
 
 # configuration constrants
-DEBUG = 1
+DEBUG = False
 LOG_FILE = "debug.log"
 CONFIG_FILE = "config/common.toml"
 DEFAULT_EXCEL_NAME = "example.xlsx"
-DEFAULT_VENDOR_SHEET = "vendor"
+DEFAULT_VENDOR_SHEET = "version"
 DEFAULT_ADDRESS_SHEET = "address_map"
 DEFAULT_OUTPUT_XML = "example.xml"
 DEFAULT_OUTPUT_JSON = "debug.json"
@@ -75,13 +75,13 @@ def setup_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--excel",
-        default=DEFAULT_EXCEL_NAME,
+        default=None,
         help="Path to the input Excel file",
     )
     parser.add_argument(
         "-o",
         "--output",
-        default=DEFAULT_OUTPUT_XML,
+        default=None,
         help="Path for the output XML file.",
     )
     return parser
@@ -109,8 +109,14 @@ def main():
     setup_logging(args.debug)
 
     config = load_config(CONFIG_FILE)
-    excel_name = config.get("sheet_name", args.excel)
-    xml_path = config.get("xml_name", args.output)
+    if args.excel is None:
+        excel_name = config.get("sheet_name", DEFAULT_EXCEL_NAME)
+    else:
+        excel_name = args.excel
+    if args.output is None:
+        xml_path = config.get("xml_name", DEFAULT_OUTPUT_XML)
+    else:
+        xml_path = args.output
     vendor_sheet = config.get("vendor_sheet", DEFAULT_VENDOR_SHEET)
     address_sheet = config.get("address_sheet", DEFAULT_ADDRESS_SHEET)
     xml_header = config.get("xml_header")
