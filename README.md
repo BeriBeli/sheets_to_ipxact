@@ -78,7 +78,6 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 
    ```shell
    uv sync
-   uv pip install -e .
    ```
 
 3. **Run the script:**
