@@ -1,8 +1,8 @@
 [project]
-name = "excel_to_ipxact"
+name = "sheets_to_ipxact"
 version = "0.1.0"
 description = "convert register description spreadsheets in a specific format into IP-XACT XML"
-license = {file = "LICENSE"}
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -14,3 +14,9 @@ dependencies = [
     "pytest>=8.4.1",
     "ruff>=0.12.3",
 ]
+
+[project.urls]
+Repository = "https://github.com/BeriBeli/sheets_to_ipxact"
+
+[project.scripts]
+sheets_to_ipxact = "main:main"
