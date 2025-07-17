@@ -19,6 +19,10 @@ The project utilizes the `polars` library for efficient Spreadsheet data process
 - [pydantic](https://docs.pydantic.dev/latest/)
 - [lxml](https://lxml.de/)
 
+### Configuration
+
+see examples in `config/common.toml`. TOML currently has **higher priority** than args, to make script command execution simpler.
+
 ### Installation and Execution
 
 We provide two recommended setup methods: using the standard `venv` or [uv](https://docs.astral.sh/uv/).
