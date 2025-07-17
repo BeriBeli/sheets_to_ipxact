@@ -20,3 +20,6 @@ Repository = "https://github.com/BeriBeli/sheets_to_ipxact"
 
 [project.scripts]
 sheets_to_ipxact = "main:main"
+
+[tool.uv]
+package = true
