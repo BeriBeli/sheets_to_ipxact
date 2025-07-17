@@ -20,31 +20,32 @@ from utils.attribute import (
 
 
 def parse_dataframe(df: pl.DataFrame) -> pl.DataFrame:
-    df0 = df.with_columns(
-        header_reg=pl.first("REG").over("ADDR"),
-        start_addr_str=pl.first("ADDR").over("ADDR"),
-        stride=(
-            pl.col("WIDTH")
-            .filter(pl.col("FIELD").is_not_null() & (pl.col("FIELD") != ""))
-            .sum()
-            .over("ADDR")
-            // 8
-        ),
-    ).with_columns(
-        is_expandable=pl.col("header_reg").str.contains(r"\{n\}"),
-        base_reg_name=pl.coalesce(
-            pl.col("header_reg").str.extract(r"(.*?)\{n\}"), pl.lit("")
-        ),
-        n_start=pl.col("header_reg").str.extract(r"n\s*=\s*(\d+)", 1).cast(pl.Int64),
-        n_end=pl.col("header_reg").str.extract(r"~\s*(\d+)", 1).cast(pl.Int64),
-        start_addr_int=pl.col("start_addr_str")
-        .str.extract(r"0x([0-9a-fA-F]+)")
-        .str.to_integer(base=16, strict=True),
-    )
-    logging.debug(df0)
-
-    df1 = (
-        df0.with_columns(
+    parsed_df = (
+        df.with_columns(
+            header_reg=pl.first("REG").over("ADDR"),
+            start_addr_str=pl.first("ADDR").over("ADDR"),
+            stride=(
+                pl.col("WIDTH")
+                .filter(pl.col("FIELD").is_not_null() & (pl.col("FIELD") != ""))
+                .sum()
+                .over("ADDR")
+                // 8  # 1Byte = 8bits
+            ),
+        )
+        .with_columns(
+            is_expandable=pl.col("header_reg").str.contains(r"\{n\}"),
+            base_reg_name=pl.coalesce(
+                pl.col("header_reg").str.extract(r"(.*?)\{n\}"), pl.lit("")
+            ),
+            n_start=pl.col("header_reg")
+            .str.extract(r"n\s*=\s*(\d+)", 1)
+            .cast(pl.Int64),
+            n_end=pl.col("header_reg").str.extract(r"~\s*(\d+)", 1).cast(pl.Int64),
+            start_addr_int=pl.col("start_addr_str")
+            .str.extract(r"0x([0-9a-fA-F]+)")
+            .str.to_integer(base=16, strict=True),
+        )
+        .with_columns(
             n_series=pl.when(
                 pl.col("is_expandable")
                 & pl.col("n_start").is_not_null()
@@ -62,24 +63,30 @@ def parse_dataframe(df: pl.DataFrame) -> pl.DataFrame:
                 & (pl.col("FIELD") != "")
             )
         )
-    )
-    logging.debug(df1)
-
-    df2 = df1.with_columns(
-        ADDR=pl.when(pl.col("is_expandable"))
-        .then(
-            (
-                pl.col("start_addr_int") + pl.col("n_series") * pl.col("stride")
-            ).map_elements(lambda x: f"0x{x:X}", return_dtype=pl.String)
+        .with_columns(
+            ADDR=pl.when(pl.col("is_expandable"))
+            .then(
+                (
+                    pl.col("start_addr_int") + pl.col("n_series") * pl.col("stride")
+                ).map_elements(lambda x: f"0x{x:X}", return_dtype=pl.String)
+            )
+            .otherwise(pl.col("ADDR")),
+            REG=pl.when(pl.col("is_expandable"))
+            .then(pl.col("base_reg_name") + "_" + pl.col("n_series").cast(pl.String))
+            .otherwise(pl.col("REG")),
         )
-        .otherwise(pl.col("ADDR")),
-        REG=pl.when(pl.col("is_expandable"))
-        .then(pl.col("base_reg_name") + "_" + pl.col("n_series").cast(pl.String))
-        .otherwise(pl.col("REG")),
     )
 
-    parsed_df = df2.select(
-        "ADDR", "REG", "FIELD", "BIT", "WIDTH", "ATTRIBUTE", "DEFAULT", "DESCRIPTION"
+    parsed_df = parsed_df.select(
+        "ADDR",
+        "REG",
+        "FIELD",
+        "BIT",
+        "WIDTH",
+        "ATTRIBUTE",
+        "DEFAULT",
+        "DESCRIPTION",
+        "stride",
     )
 
     return parsed_df
@@ -138,7 +145,9 @@ def process_register_sheet(df: pl.DataFrame) -> list[Register]:
     try:
         # Pre-process the dataframe
         filled_df = df.select(pl.all().forward_fill())
+        logging.debug(f"filled_df is {filled_df}")
         parsed_df = parse_dataframe(filled_df)
+        logging.debug(f"parsed_df is {parsed_df}")
     except pl.exceptions.PolarsError as e:
         logging.error(f"Polars error during pre-processing of a register sheet: {e}")
         return []
@@ -151,7 +160,6 @@ def process_register_sheet(df: pl.DataFrame) -> list[Register]:
             continue
 
         fields: list[FieldType] = []
-        total_bit_width = 0
         first_row = group.row(0, named=True)
 
         for field_row in group.iter_rows(named=True):
@@ -175,7 +183,6 @@ def process_register_sheet(df: pl.DataFrame) -> list[Register]:
                     resets=Resets(reset=[Reset(value=str(field_row["DEFAULT"]))]),
                 )
                 fields.append(field)
-                total_bit_width += int(field.bit_width)
             except (KeyError, ValueError, TypeError) as e:
                 logging.error(
                     f"Skipping invalid field '{field_row.get('FIELD', 'N/A')}' in register '{reg_name}': {e}"
@@ -193,7 +200,7 @@ def process_register_sheet(df: pl.DataFrame) -> list[Register]:
                 Register(
                     name=str(reg_name[0]),
                     address_offset=str(first_row["ADDR"]),
-                    size=total_bit_width,
+                    size=int(first_row["stride"]) * 8,  # stride: Byte
                     fields=fields,
                 )
             )
