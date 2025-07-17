@@ -1,0 +1,16 @@
+[project]
+name = "excel_to_ipxact"
+version = "0.1.0"
+description = "convert register description spreadsheets in a specific format into IP-XACT XML"
+license = {file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastexcel>=0.14.0",
+    "lxml>=6.0.0",
+    "mypy>=1.17.0",
+    "polars>=1.31.0",
+    "pydantic>=2.11.7",
+    "pytest>=8.4.1",
+    "ruff>=0.12.3",
+]
