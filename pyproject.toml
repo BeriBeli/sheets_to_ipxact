@@ -1,6 +1,6 @@
 [project]
 name = "sheets_to_ipxact"
-version = "0.1.0"
+version = "0.2.0"
 description = "convert register description spreadsheets in a specific format into IP-XACT XML"
 license = "MIT"
 readme = "README.md"
