@@ -1,8 +1,21 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic_xml import BaseXmlModel, element, attr
 
-type AccessType = Literal[
+
+NAMESPACE = "ipxact"
+
+NAMESPACE_MAP = {
+    "ipxact": "http://www.accellera.org/XMLSchema/IPXACT/1685-2014",
+    "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+}
+
+SCHEMA_LOCATION = (
+    "http://www.accellera.org/XMLSchema/IPXACT/1685-2014 "
+    "http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd"
+)
+
+AccessType = Literal[
     "read-only",
     "write-only",
     "read-write",
@@ -10,18 +23,18 @@ type AccessType = Literal[
     "read-writeOnce",
 ]
 
-type BankAlignmentType = Literal[
+BankAlignmentType = Literal[
     "serial",
     "parallel",
 ]
 
-type EnumeratedValueUsageType = Literal[
+EnumeratedValueUsageType = Literal[
     "read",
     "write",
     "read-write",
 ]
 
-type ModifiedWriteValueType = Literal[
+ModifiedWriteValueType = Literal[
     "oneToClear",
     "oneToSet",
     "oneToToggle",
@@ -33,32 +46,32 @@ type ModifiedWriteValueType = Literal[
     "modify",
 ]
 
-type ReadActionType = Literal[
+ReadActionType = Literal[
     "clear",
     "set",
     "modify",
 ]
 
-type SharedType = Literal[
+SharedType = Literal[
     "yes",
     "no",
     "undefined",
 ]
 
-type TestableTestConstraintType = Literal[
+TestableTestConstraintType = Literal[
     "unconstrained",
     "restore",
     "writeAsRead",
     "readOnly",
 ]
 
-type UsageType = Literal[
+UsageType = Literal[
     "memory",
     "register",
     "reserved",
 ]
 
-type FormatType = Literal[
+FormatType = Literal[
     "bit",
     "byte",
     "shortint",
@@ -69,13 +82,13 @@ type FormatType = Literal[
     "string",
 ]
 
-type SignType = Literal[
+SignType = Literal[
     "signed",
     "unsigned",
 ]
 
 
-type ParameterPrefixType = Literal[
+ParameterPrefixType = Literal[
     "deca",
     "hecto",
     "kilo",
@@ -98,7 +111,7 @@ type ParameterPrefixType = Literal[
     "yocto",
 ]
 
-type ParameterUnitType = Literal[
+ParameterUnitType = Literal[
     "second",
     "ampere",
     "kelvin",
@@ -115,192 +128,175 @@ type ParameterUnitType = Literal[
 ]
 
 
-type ParameterResolveType = Literal[
+ParameterResolveType = Literal[
     "immediate",
     "user",
     "generated",
 ]
 
 
-class NameBaseModel(BaseModel):
-    name: str = Field(
-        ...,
-        serialization_alias="name",
-    )
-    display_name: str | None = Field(
-        None,
-        serialization_alias="displayName",
-    )
-    description: str | None = Field(
-        None,
-        serialization_alias="description",
-    )
-
-
-class VendorBaseModel(BaseModel):
-    vendor_extensions: list[object] | None = Field(
-        None,
-        serialization_alias="vendorExtensions",
-    )
-
-
-class IdBaseModel(BaseModel):
-    id: int | str | None = Field(
-        None,
-        serialization_alias="@id",
-    )
-
-
-class SchemaBaseModel(NameBaseModel, VendorBaseModel, IdBaseModel):
+class SchemaBaseModel(BaseXmlModel, ns=NAMESPACE, nsmap=NAMESPACE_MAP):
     pass
 
 
-class Testable(BaseModel):
-    test_constraint: TestableTestConstraintType = Field(
-        ...,
-        serialization_alias="@testConstraint",
+class NameBaseModel(SchemaBaseModel):
+    name: str = element(
+        tag="name",
     )
-    value: bool = Field(
-        ...,
-        serialization_alias="#text",
+    display_name: str | None = element(
+        tag="displayName",
+        default=None,
     )
-
-
-class EnumeratedValue(SchemaBaseModel):
-    value: int | str = Field(
-        ...,
-        serialization_alias="value",
-    )
-    usage: EnumeratedValueUsageType | None = Field(
-        None,
-        serialization_alias="@usage",
+    description: str | None = element(
+        tag="description",
+        default=None,
     )
 
 
-class EnumeratedValues(BaseModel):
-    enumerated_value: list[EnumeratedValue] = Field(
-        [],
-        serialization_alias="enumeratedValue",
+class VendorBaseModel(SchemaBaseModel):
+    vendor_extensions: list[str] | None = element(
+        tag="vendorExtensions",
+        default=None,
+    )
+
+
+class IdBaseModel(SchemaBaseModel):
+    id: int | str | None = attr(
+        name="id",
+        default=None,
+    )
+
+
+class Testable(SchemaBaseModel):
+    test_constraint: TestableTestConstraintType = attr(
+        name="testConstraint",
+    )
+    content: bool
+
+
+class EnumeratedValue(NameBaseModel, VendorBaseModel, IdBaseModel):
+    value: int | str = element(
+        tag="value",
+    )
+    usage: EnumeratedValueUsageType | None = attr(
+        name="usage",
+        default=None,
+    )
+
+
+class EnumeratedValues(SchemaBaseModel):
+    enumerated_value: list[EnumeratedValue] = element(
+        tag="enumeratedValue",
+        default=[],
     )
 
 
 class Reset(IdBaseModel):
-    value: int | str = Field(
-        ...,
-        serialization_alias="value",
+    value: int | str = element(
+        tag="value",
     )
-    mask: int | str | None = Field(
-        None,
-        serialization_alias="mask",
+    mask: int | str | None = element(
+        tag="mask",
+        default=None,
     )
-    reset_type_ref: str | None = Field(
-        None,
-        serialization_alias="@resetTypeRef",
+    reset_type_ref: str | None = attr(
+        name="resetTypeRef",
+        default=None,
     )
 
 
-class Resets(BaseModel):
-    reset: list[Reset] = Field(
-        [],
-        serialization_alias="reset",
+class Resets(SchemaBaseModel):
+    reset: list[Reset] = element(
+        tag="reset",
+        default=[],
     )
 
 
 class Dim(IdBaseModel):
-    value: int | str = Field(
-        ...,
-        serialization_alias="#text",
-    )
+    content: int | str
 
 
-class WriteValueConstraintType(BaseModel):
-    write_as_read: bool | None = Field(
-        None,
-        serialization_alias="writeAsRead",
+class WriteValueConstraintType(SchemaBaseModel):
+    write_as_read: bool | None = element(
+        tag="writeAsRead",
+        default=None,
     )
-    use_enumerated_values: bool | None = Field(
-        None,
-        serialization_alias="useEnumeratedValues",
+    use_enumerated_values: bool | None = element(
+        tag="useEnumeratedValues",
+        default=None,
     )
-    minimum: int | str | None = Field(
-        None,
-        serialization_alias="minimum",
+    minimum: int | str | None = element(
+        tag="minimum",
+        default=None,
     )
-    maximum: int | str | None = Field(
-        None,
-        serialization_alias="maximum",
+    maximum: int | str | None = element(
+        tag="maximum",
+        default=None,
     )
 
 
 class ViewRef(IdBaseModel):
-    value: str = Field(
-        ...,
-        serialization_alias="#text",
-    )
+    content: str
 
 
-class Indices(BaseModel):
-    index: list[int | str] = Field(
-        [],
-        serialization_alias="index",
+class Indices(SchemaBaseModel):
+    index: list[int | str] = element(
+        tag="index",
+        default=[],
     )
 
 
 class PathSegmentType(IdBaseModel):
-    path_segment_name: str = Field(
-        ...,
-        serialization_alias="pathSegmentName",
+    path_segment_name: str = element(
+        tag="pathSegmentName",
     )
-    indices: Indices | None = Field(
-        None,
-        serialization_alias="indices",
+    indices: Indices | None = element(
+        tag="indices",
+        default=None,
     )
 
 
-class PathSegments(BaseModel):
-    path_segment: list[PathSegmentType] = Field(
-        [],
-        serialization_alias="pathSegment",
+class PathSegments(SchemaBaseModel):
+    path_segment: list[PathSegmentType] = element(
+        tag="pathSegment",
+        default=[],
     )
 
 
 class AccessHandle(IdBaseModel):
-    view_ref: list[ViewRef] = Field(
-        [],
-        serialization_alias="viewRef",
+    view_ref: list[ViewRef] = element(
+        tag="viewRef",
+        default=[],
     )
-    indices: Indices | None = Field(
-        None,
-        serialization_alias="indices",
+    indices: Indices | None = element(
+        tag="indices",
+        default=None,
     )
-    path_segments: PathSegments = Field(
-        ...,
-        serialization_alias="pathSegments",
-    )
-
-
-class AccessHandles(BaseModel):
-    access_handle: list[AccessHandle] = Field(
-        [],
-        serialization_alias="accessHandle",
+    path_segments: PathSegments = element(
+        tag="pathSegments",
     )
 
 
-class Vector(BaseModel):
-    left: int | str = Field(
-        ...,
-        serialization_alias="left",
-    )
-    right: int | str = Field(
-        ...,
-        serialization_alias="right",
+class AccessHandles(SchemaBaseModel):
+    access_handle: list[AccessHandle] = element(
+        tag="accessHandle",
+        default=[],
     )
 
 
-class Vectors(BaseModel):
-    vector: list[Vector] = Field(
-        [],
-        serialization_alias="vector",
+class Vector(SchemaBaseModel):
+    left: int | str = element(
+        tag="left",
+    )
+    right: int | str = element(
+        tag="right",
+    )
+
+
+class Vectors(SchemaBaseModel):
+    vector: list[Vector] = element(
+        tag="vector",
+        default=[],
     )
 
 
@@ -308,329 +304,327 @@ class Array(Vector, IdBaseModel):
     pass
 
 
-class Arrays(BaseModel):
-    array: list[Array] = Field(
-        [],
-        serialization_alias="array",
+class Arrays(SchemaBaseModel):
+    array: list[Array] = element(
+        tag="array",
+        default=[],
     )
 
 
 class Parameter(NameBaseModel, VendorBaseModel):
-    vectors: Vectors | None = Field(
-        None,
+    vectors: Vectors | None = element(
+        default=None,
     )
-    arrays: Arrays | None = Field(None, serialization_alias="arrays")
-    value: int | str = Field(..., serialization_alias="value")
-    parameter_id: str | None = Field(
-        None,
-        serialization_alias="@parameterId",
+    arrays: Arrays | None = element(
+        tag="arrays",
+        default=None,
     )
-    prompt: str | None = Field(
-        None,
-        serialization_alias="@prompt",
+    value: int | str = element(
+        tag="value",
     )
-    choice_ref: str | None = Field(
-        None,
-        serialization_alias="@choiceRef",
+    parameter_id: str | None = attr(
+        name="parameterId",
+        default=None,
     )
-    order: float | None = Field(
-        None,
-        serialization_alias="@order",
+    prompt: str | None = attr(
+        name="prompt",
+        default=None,
     )
-    config_groups: list[str] = Field(
-        [],
-        serialization_alias="@configGroups",
+    choice_ref: str | None = attr(
+        name="choiceRef",
+        default=None,
     )
-    minimum: str | None = Field(
-        None,
-        serialization_alias="@minimum",
+    order: float | None = attr(
+        name="order",
+        default=None,
     )
-    maximum: str | None = Field(
-        None,
-        serialization_alias="@maximum",
+    # config_groups: list[str] | None
+    minimum: str | None = attr(
+        name="minimum",
+        default=None,
     )
-    type_value: FormatType = Field(
-        ...,
-        serialization_alias="@type",
+    maximum: str | None = attr(
+        name="maximum",
+        default=None,
     )
-    sign: SignType | None = Field(
-        None,
-        serialization_alias="@sign",
+    type_value: FormatType = attr(
+        name="type",
     )
-    prefix: ParameterPrefixType | None = Field(None, serialization_alias="@prefix")
-    unit: ParameterUnitType | None = Field(None, serialization_alias="@unit")
-    resolve: ParameterResolveType = Field(
-        ...,
-        serialization_alias="@resolve",
+    sign: SignType | None = attr(
+        name="sign",
+        default=None,
+    )
+    prefix: ParameterPrefixType | None = attr(
+        name="prefix",
+        default=None,
+    )
+    unit: ParameterUnitType | None = attr(
+        name="unit",
+        default=None,
+    )
+    resolve: ParameterResolveType = attr(
+        name="resolve",
     )
 
 
-class Parameters(BaseModel):
-    parameter: list[Parameter] = Field([], serialization_alias="parameter")
+class Parameters(SchemaBaseModel):
+    parameter: list[Parameter] = element(
+        tag="parameter",
+        default=[],
+    )
 
 
-class FieldType(SchemaBaseModel):
-    access_handles: AccessHandles | None = Field(
-        None,
-        serialization_alias="accessHandles",
+class FieldType(NameBaseModel, VendorBaseModel, IdBaseModel):
+    access_handles: AccessHandles | None = element(
+        tag="accessHandles",
+        default=None,
     )
-    is_present: str | None = Field(
-        None,
-        serialization_alias="str",
+    is_present: str | None = element(
+        tag="isPresent",
+        default=None,
     )
-    bit_offset: int | str = Field(
-        ...,
-        serialization_alias="bitOffset",
+    bit_offset: int | str = element(
+        tag="bitOffset",
     )
-    resets: Resets | None = Field(
-        None,
-        serialization_alias="resets",
+    resets: Resets | None = element(
+        tag="resets",
+        default=None,
     )
-    type_identifier: str | None = Field(
-        None,
-        serialization_alias="typeIdentifier",
+    type_identifier: str | None = element(
+        tag="typeIdentifier",
+        default=None,
     )
-    bit_width: int | str = Field(
-        ...,
-        serialization_alias="bitWidth",
+    bit_width: int | str = element(
+        tag="bitWidth",
     )
-    volatile: bool | None = Field(None, serialization_alias="volatile")
-    access: AccessType | None = Field(
-        None,
-        serialization_alias="access",
+    volatile: bool | None = element(
+        tag="volatile",
+        default=None,
     )
-    enumerated_values: EnumeratedValues | None = Field(
-        None,
-        serialization_alias="enumeratedValues",
+    access: AccessType | None = element(
+        tag="access",
+        default=None,
     )
-    modified_write_value: ModifiedWriteValueType | None = Field(
-        None,
-        serialization_alias="modifiedWriteValue",
+    enumerated_values: EnumeratedValues | None = element(
+        tag="enumeratedValues",
+        default=None,
     )
-    write_value_constraint: WriteValueConstraintType | None = Field(
-        None,
-        serialization_alias="writeValueConstraint",
+    modified_write_value: ModifiedWriteValueType | None = element(
+        tag="modifiedWriteValue",
+        default=None,
     )
-    read_action: ReadActionType | None = Field(
-        None,
-        serialization_alias="readAction",
+    write_value_constraint: WriteValueConstraintType | None = element(
+        tag="writeValueConstraint",
+        default=None,
     )
-    testable: Testable | None = Field(
-        None,
-        serialization_alias="testable",
+    read_action: ReadActionType | None = element(
+        tag="readAction",
+        default=None,
     )
-    reserved: int | str | None = Field(
-        None,
-        serialization_alias="reserved",
+    testable: Testable | None = element(
+        tag="testable",
+        default=None,
     )
-    parameters: Parameters | None = Field(
-        None,
-        serialization_alias="parameters",
+    reserved: int | str | None = element(
+        tag="reserved",
+        default=None,
     )
-    field_id: str | None = Field(
-        None,
-        serialization_alias="@fieldID",
+    parameters: Parameters | None = element(
+        tag="parameters",
+        default=None,
+    )
+    element_id: str | None = attr(
+        name="elementID",
+        default=None,
     )
 
 
 class AlternateGroup(IdBaseModel):
-    value: str = Field(
-        ...,
-        serialization_alias="#text",
-    )
+    content: str
 
 
 class AlternateGroups(IdBaseModel):
-    alternate_group: list[AlternateGroup] = Field(
-        [],
-        serialization_alias="alternateGroup",
+    alternate_group: list[AlternateGroup] = element(
+        tag="alternateGroup",
+        default=[],
     )
 
 
-class AlternateRegister(SchemaBaseModel):
-    access_handles: AccessHandles | None = Field(
-        None,
-        serialization_alias="accessHandles",
+class AlternateRegister(NameBaseModel, VendorBaseModel, IdBaseModel):
+    access_handles: AccessHandles | None = element(
+        tag="accessHandles",
+        default=None,
     )
-    is_present: str | None = Field(
-        None,
-        serialization_alias="str",
+    is_present: str | None = element(
+        tag="isPresent",
+        default=None,
     )
-    alternate_groups: AlternateGroups = Field(
-        ...,
-        serialization_alias="alternateGroups",
+    alternate_groups: AlternateGroups = element(
+        tag="alternateGroups",
     )
-    type_identifier: str | None = Field(
-        None,
-        serialization_alias="typeIdentifier",
+    type_identifier: str | None = element(
+        tag="typeIdentifier",
+        default=None,
     )
-    volatile: bool | None = Field(
-        None,
-        serialization_alias="volatile",
+    volatile: bool | None = element(
+        tag="volatile",
+        default=None,
     )
-    access: AccessType | None = Field(
-        None,
-        serialization_alias="access",
+    access: AccessType | None = element(
+        tag="access",
+        default=None,
     )
-    fields: list[FieldType] = Field(
-        [],
-        serialization_alias="field",
+    fields: list[FieldType] = element(
+        tag="field",
+        default=[],
     )
-    parameters: Parameters | None = Field(None, serialization_alias="parameters")
-
-
-class AlternateRegisters(BaseModel):
-    alternate_register: list[AlternateRegister] = Field(
-        [],
-        serialization_alias="alternateRegister",
+    parameters: Parameters | None = element(
+        tag="parameters",
+        default=None,
     )
 
 
-class Register(SchemaBaseModel):
-    access_handles: AccessHandles | None = Field(
-        None,
-        serialization_alias="accessHandles",
-    )
-    is_present: str | None = Field(
-        None,
-        serialization_alias="str",
-    )
-    dim: list[Dim] | None = Field(
-        None,
-        serialization_alias="dim",
-    )
-    address_offset: int | str = Field(
-        ...,
-        serialization_alias="addressOffset",
-    )
-    type_identifier: str | None = Field(
-        None,
-        serialization_alias="typeIdentifier",
-    )
-    size: int | str = Field(..., serialization_alias="size")
-    volatile: bool | None = Field(
-        None,
-        serialization_alias="volatile",
-    )
-    access: AccessType | None = Field(
-        None,
-        serialization_alias="access",
-    )
-    fields: list[FieldType] = Field(
-        [],
-        serialization_alias="field",
-    )
-    alternate_registers: AlternateRegisters | None = Field(
-        None,
-        serialization_alias="alternateRegisters",
-    )
-    parameters: Parameters | None = Field(
-        None,
-        serialization_alias="parameters",
+class AlternateRegisters(SchemaBaseModel):
+    alternate_register: list[AlternateRegister] = element(
+        tag="alternateRegister",
+        default=[],
     )
 
 
-class AddressBlock(SchemaBaseModel):
-    access_handles: AccessHandles | None = Field(
-        None,
-        serialization_alias="accessHandles",
+class Register(NameBaseModel, VendorBaseModel, IdBaseModel):
+    access_handles: AccessHandles | None = element(
+        tag="accessHandles",
+        default=None,
     )
-    is_present: str | None = Field(
-        None,
-        serialization_alias="str",
+    is_present: str | None = element(
+        tag="isPresent",
+        default=None,
     )
-    base_address: int | str = Field(
-        ...,
-        serialization_alias="baseAddress",
+    dim: list[Dim] | None = element(
+        tag="dim",
+        default=None,
     )
-    type_identifier: str | None = Field(
-        None,
-        serialization_alias="typeIdentifier",
+    address_offset: int | str = element(
+        tag="addressOffset",
     )
-    range: int | str = Field(
-        ...,
-        serialization_alias="range",
+    type_identifier: str | None = element(
+        tag="typeIdentifier",
+        default=None,
     )
-    width: int | str = Field(
-        ...,
-        serialization_alias="width",
+    size: int | str = element(
+        tag="size",
     )
-    usage: UsageType | None = Field(
-        None,
-        serialization_alias="usage",
+    volatile: bool | None = element(
+        tag="volatile",
+        default=None,
     )
-    volatile: bool | None = Field(None, serialization_alias="volatile")
-    access: AccessType | None = Field(
-        None,
-        serialization_alias="access",
+    access: AccessType | None = element(
+        tag="access",
+        default=None,
     )
-    parameters: Parameters | None = Field(None, serialization_alias="parameters")
-    registers: list[Register] = Field(
-        [],
-        serialization_alias="register",
+    fields: list[FieldType] = element(
+        tag="field",
+        default=[],
     )
-    # register_file: list[RegisterFile] = Field(
-    #     [],
-    #     serialization_alias="registerFile",
-    # )
-
-
-class MemoryMap(SchemaBaseModel):
-    is_present: str | None = Field(
-        None,
-        serialization_alias="str",
+    alternate_registers: AlternateRegisters | None = element(
+        tag="alternateRegisters",
+        default=None,
     )
-    address_block: list[AddressBlock] = Field(
-        [],
-        serialization_alias="addressBlock",
-    )
-    # bank: list[Bank] = Field(
-    #     [],
-    #     serialization_alias="bank",
-    # )
-    # subspace_map: list[SubspaceRefType] = Field(
-    #     [],
-    #     serialization_alias="subspaceMap",
-    # )
-    # memory_remap: list[MemoryRemapType] = Field(
-    #     [],
-    #     serialization_alias="memoryRemap",
-    # )
-    # address_unit_bits: AddressUnitBits | None = Field(
-    #     None,
-    #     serialization_alias="addressUnitBits",
-    # )
-    shared: SharedType | None = Field(
-        None,
-        serialization_alias="shared",
+    parameters: Parameters | None = element(
+        tag="parameters",
+        default=None,
     )
 
 
-class MemoryMaps(BaseModel):
-    memory_map: list[MemoryMap] = Field(
-        [],
-        serialization_alias="memoryMap",
+class AddressBlock(NameBaseModel, VendorBaseModel, IdBaseModel):
+    access_handles: AccessHandles | None = element(
+        tag="accessHandles",
+        default=None,
+    )
+    is_present: str | None = element(
+        tag="isPresent",
+        default=None,
+    )
+    base_address: int | str = element(
+        tag="baseAddress",
+    )
+    type_identifier: str | None = element(
+        tag="typeIdentifier",
+        default=None,
+    )
+    range: int | str = element(
+        tag="range",
+    )
+    width: int | str = element(
+        tag="width",
+    )
+    usage: UsageType | None = element(
+        tag="usage",
+        default=None,
+    )
+    volatile: bool | None = element(
+        tag="volatile",
+        default=None,
+    )
+    access: AccessType | None = element(
+        tag="access",
+        default=None,
+    )
+    parameters: Parameters | None = element(
+        tag="parameters",
+        default=None,
+    )
+    registers: list[Register] = element(
+        tag="register",
+        default=[],
+    )
+    # register_file: list[RegisterFile]
+
+
+class MemoryMap(NameBaseModel, VendorBaseModel, IdBaseModel):
+    is_present: str | None = element(
+        tag="isPresent",
+        default=None,
+    )
+    address_block: list[AddressBlock] = element(
+        tag="addressBlock",
+        default=[],
+    )
+    # bank: list[Bank]
+    # subspace_map: list[SubspaceRefType]
+    # memory_remap: list[MemoryRemapType]
+    # address_unit_bits: AddressUnitBits | None
+    shared: SharedType | None = element(
+        tag="shared",
+        default=None,
     )
 
 
-class Component(BaseModel):
-    vendor: str = Field(
-        ...,
-        serialization_alias="vendor",
+class MemoryMaps(SchemaBaseModel):
+    memory_map: list[MemoryMap] = element(
+        tag="memoryMap",
+        default=[],
     )
-    library: str = Field(
-        ...,
-        serialization_alias="library",
+
+
+class Component(SchemaBaseModel, tag="component"):
+    schema_location: str = attr(
+        name="schemaLocation",
+        default=SCHEMA_LOCATION,
+        ns="xsi",
     )
-    name: str = Field(
-        ...,
-        serialization_alias="name",
+    vendor: str = element(
+        tag="vendor",
     )
-    version: str = Field(
-        ...,
-        serialization_alias="version",
+    library: str = element(
+        tag="library",
     )
-    memory_maps: MemoryMaps = Field(
-        ...,
-        serialization_alias="memoryMaps",
+    name: str = element(
+        tag="name",
+    )
+    version: str = element(
+        tag="version",
+    )
+    memory_maps: MemoryMaps = element(
+        tag="memoryMaps",
     )
