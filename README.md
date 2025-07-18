@@ -12,9 +12,10 @@ This is a Python script designed to convert register description spreadsheets in
 
 ### Dependencies
 
-- Python 3.12
+- Python 3.11+
 - [polars](https://www.pola.rs/)
 - [pydantic](https://docs.pydantic.dev/latest/)
+- [pydantic-xml](https://pydantic-xml.readthedocs.io/en/latest/index.html)
 - [lxml](https://lxml.de/)
 
 ### Configuration
@@ -29,16 +30,6 @@ xml_name = "example.xml"
 vendor_sheet = "version"
 # the name of the sheet giving an address map of the system
 address_sheet = "address_map"
-
-# ipxact xml header
-[xml_header]
-root_tag = "component"
-schema_location = "http://www.accellera.org/XMLSchema/IPXACT/1685-2014 http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd"
-default_ns_prefix = "ipxact"
-
-[xml_header.ns_map]
-ipxact = "http://www.accellera.org/XMLSchema/IPXACT/1685-2014"
-xsi = "http://www.w3.org/2001/XMLSchema-instance"
 ```
 
 ### Installation and Execution
@@ -51,6 +42,7 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 
    ```shell
    # Create a virtual environment in the project root directory  
+   # python version >= 3.11
    python3 -m venv .venv  
    
    # Activate the environment  
@@ -71,6 +63,11 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 
    ```shell
    sheets_to_ipxact
+   # options:
+   # -h, --help                     show this help message and exit
+   # -d, --debug                    Enable debug logging.
+   # --excel EXCEL                  Path to the input Excel file
+   # -o OUTPUT, --output OUTPUT     Path for the output XML file.
    ```
    or
    ```shell
@@ -84,7 +81,7 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 1. **Create and activate a virtual environment:**
 
    ```shell
-   # Create a virtual environment using Python 3.12  
+   # Create a virtual environment using Python 3.12 for an example
    uv venv --python 3.12  
    
    # Activate the environment  
@@ -104,6 +101,11 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 
    ```shell
    sheets_to_ipxact
+   # options:
+   # -h, --help                     show this help message and exit
+   # -d, --debug                    Enable debug logging.
+   # --excel EXCEL                  Path to the input Excel file
+   # -o OUTPUT, --output OUTPUT     Path for the output XML file.
    ```
    or
    ```shell
@@ -112,9 +114,4 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 
 
 ## Warning
-1. Not All IP-XACT standard implemented by `schema.py`
-2. `dict_xml.py` Can't completely convert dict format to XML
-
-## TODO
-1. add tests
-2. fix bugs
+IP-XACT IEEE-1685-2014 standard is not completely implemented by `schema.py`
