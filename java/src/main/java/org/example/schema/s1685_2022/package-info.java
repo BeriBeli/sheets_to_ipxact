@@ -4,5 +4,11 @@
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 //
 
-@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.accellera.org/XMLSchema/IPXACT/1685-2022", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@XmlSchema(namespace = "http://www.accellera.org/XMLSchema/IPXACT/1685-2022", elementFormDefault = XmlNsForm.QUALIFIED, xmlns = {
+    @XmlNs(prefix = "ipxact", namespaceURI = "http://www.accellera.org/XMLSchema/IPXACT/1685-2022")
+})
 package org.example.schema.s1685_2022;
+
+import jakarta.xml.bind.annotation.XmlSchema;
+import jakarta.xml.bind.annotation.XmlNs;
+import jakarta.xml.bind.annotation.XmlNsForm;

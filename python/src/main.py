@@ -21,6 +21,7 @@ DEFAULT_EXCEL_NAME = "example.xlsx"
 DEFAULT_VENDOR_SHEET = "version"
 DEFAULT_ADDRESS_SHEET = "address_map"
 DEFAULT_OUTPUT_XML = "example.xml"
+DEFAULT_IPXACT_VERSION = "1685-2014"
 DEFAULT_JAVA_JAR = "../java/target/ipxact_schema-1.0.0.jar"
 DEFAULT_JAVA_DEPENDENCY_JARS = "../java/target/dependency/*.jar"
 
@@ -76,6 +77,11 @@ def setup_arg_parser() -> argparse.ArgumentParser:
         default=DEFAULT_ADDRESS_SHEET,
         help="Name of the address map sheet.",
     )
+    parser.add_argument(
+        "--ipxact_version",
+        default=DEFAULT_IPXACT_VERSION,
+        help="IP-XACT version to use (e.g., 1685-2009, 1685-2014, 1685-2022)",
+    )
     return parser
 
 
@@ -88,6 +94,13 @@ def main():
     xml_path = str(args.output)
     vendor_sheet = str(args.vendor_sheet)
     address_sheet = str(args.address_sheet)
+    ipxact_version = str(args.ipxact_version)
+    if ipxact_version != DEFAULT_IPXACT_VERSION:
+        logging.critical(
+            f"IP-XACT version '{ipxact_version}' is not supported now."
+        )
+        sys.exit(1)
+
 
     try:
         sheet_names = fastexcel.read_excel(excel_name).sheet_names
@@ -112,9 +125,22 @@ def main():
         logging.info("Java classes imported successfully.")
 
         object_factory = ObjectFactory()
-        AccessType = jpype.JClass("org.example.schema.s1685_2014.AccessType")
-        ModifiedWriteValueType = jpype.JClass("org.example.schema.s1685_2014.ModifiedWriteValueType")
-        ReadActionType = jpype.JClass("org.example.schema.s1685_2014.ReadActionType")
+        match (ipxact_version):
+            case "1685-2009":    
+                AccessType = jpype.JClass("org.example.schema.s1685_2009.AccessType")
+                ModifiedWriteValueType = jpype.JClass("org.example.schema.s1685_2009.ModifiedWriteValueType")
+                ReadActionType = jpype.JClass("org.example.schema.s1685_2009.ReadActionType")
+            case "1685-2014":
+                AccessType = jpype.JClass("org.example.schema.s1685_2014.AccessType")
+                ModifiedWriteValueType = jpype.JClass("org.example.schema.s1685_2014.ModifiedWriteValueType")
+                ReadActionType = jpype.JClass("org.example.schema.s1685_2014.ReadActionType")
+            case "1685-2022":
+                AccessType = jpype.JClass("org.example.schema.s1685_2022.AccessType")
+                ModifiedWriteValueType = jpype.JClass("org.example.schema.s1685_2022.ModifiedWriteValueType")
+                ReadActionType = jpype.JClass("org.example.schema.s1685_2022.ReadActionType")
+            case _:
+                logging.error(f"Unsupported IP-XACT version: {ipxact_version}")
+        IpXactVersion = jpype.JClass("org.example.IpXactVersion")
 
         address_blocks: list[Any] = []
         all_registers: dict[str, list[Any]] = {}
@@ -169,7 +195,7 @@ def main():
         memory_map_list.add(memory_map)
         component.setMemoryMaps(memory_maps)
 
-        XmlGenerator.generateXml(component, xml_path)
+        XmlGenerator.generateXml(component, IpXactVersion.fromValue(ipxact_version), xml_path)
 
     except Exception as e:
         logging.critical(f"An error occurred during processing: {e}")

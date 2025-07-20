@@ -4,5 +4,11 @@
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 //
 
-@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@XmlSchema(namespace = "http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009", elementFormDefault = XmlNsForm.QUALIFIED, xmlns = {
+    @XmlNs(prefix = "spirit", namespaceURI = "http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009")
+})
 package org.example.schema.s1685_2009;
+
+import jakarta.xml.bind.annotation.XmlSchema;
+import jakarta.xml.bind.annotation.XmlNs;
+import jakarta.xml.bind.annotation.XmlNsForm;

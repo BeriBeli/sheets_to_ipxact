@@ -1,19 +1,20 @@
 package org.example;
 
-import org.example.schema.s1685_2014.*;
-import jakarta.xml.bind.*;
-
 import javax.xml.namespace.QName;
 import java.io.File;
 
+import jakarta.xml.bind.*;
+
+import org.example.IpXactVersion;
+
 public class XmlGenerator {
-    public static void generateXml(ComponentType component, String filePath) throws Exception {
-        JAXBContext context = JAXBContext.newInstance(ComponentType.class);
+    public static void generateXml(Object component, IpXactVersion version, String filePath) throws Exception {
+        JAXBContext context = JAXBContext.newInstance(component.getClass());
         Marshaller marshaller = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.accellera.org/XMLSchema/IPXACT/1685-2014 http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd");
-        JAXBElement<ComponentType> componentElement = new JAXBElement<>(
-                new QName("http://www.accellera.org/XMLSchema/IPXACT/1685-2014", "component"),
-                ComponentType.class,
+        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, version.getSchemaLocation());
+        JAXBElement<?> componentElement = new JAXBElement<>(
+                new QName(version.getNameSpace(), "component"),
+                (Class<Object>) component.getClass(),
                 component
         );
         marshaller.marshal(componentElement, new File(filePath));
