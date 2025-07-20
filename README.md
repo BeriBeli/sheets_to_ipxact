@@ -115,3 +115,4 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 
 ## Warning
 IP-XACT IEEE-1685-2014 standard is not completely implemented by `schema.py`
+For complete implemention, See Branch `java_schema`
