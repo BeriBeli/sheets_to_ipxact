@@ -1,0 +1,28 @@
+[project]
+name = "ipxact_register_generator"
+version = "0.3.0"
+description = "convert register description spreadsheets in a specific format into IP-XACT XML"
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastexcel>=0.14.0",
+    "jpype1>=1.6.0",
+    "mypy>=1.17.0",
+    "polars>=1.31.0",
+    "pytest>=8.4.1",
+    "ruff>=0.12.3",
+]
+
+[project.urls]
+Repository = "https://github.com/BeriBeli/ipxact_register_generator"
+
+[project.scripts]
+irgen = "main:main"
+
+[tool.uv]
+package = true
+
+[[tool.uv.index]]
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+default = true
