@@ -86,6 +86,7 @@ Run the generator from the command line using the `irgen` command. Provide the p
 **Example:**
 
 ```shell
+# python/.venv/bin/irgen or python\.venv\Scripts\irgen
 irgen --excel example.xlsx -o example.xml
 ```
 
