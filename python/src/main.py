@@ -2,6 +2,7 @@ import sys
 import glob
 import logging
 import argparse
+from pathlib import Path
 from typing import Any
 
 import polars as pl
@@ -22,8 +23,8 @@ DEFAULT_VENDOR_SHEET = "version"
 DEFAULT_ADDRESS_SHEET = "address_map"
 DEFAULT_OUTPUT_XML = "example.xml"
 DEFAULT_IPXACT_VERSION = "1685-2014"
-DEFAULT_JAVA_JAR = "../java/target/ipxact_schema-1.0.0.jar"
-DEFAULT_JAVA_DEPENDENCY_JARS = "../java/target/dependency/*.jar"
+DEFAULT_JAVA_JAR = "../../java/target/ipxact_schema-1.0.0.jar"
+DEFAULT_JAVA_DEPENDENCY = "../../java/target/dependency"
 
 
 def setup_logging(debug: bool):
@@ -108,14 +109,18 @@ def main():
         logging.critical(f"Could not read Excel file '{excel_name}': {e}")
         sys.exit(1)
 
-    project_jar = DEFAULT_JAVA_JAR
+    project_jar_path = (Path(__file__).parent / DEFAULT_JAVA_JAR).resolve()
+    dependency_path = (Path(__file__).parent / DEFAULT_JAVA_DEPENDENCY).resolve()
+    logging.debug(f"jar_path: {project_jar_path}")
+    logging.debug(f"dependency_path: {dependency_path}")
+    
     try:
-        dependency_jars = glob.glob(DEFAULT_JAVA_DEPENDENCY_JARS)
+        dependency_jars = glob.glob(str(dependency_path) + "/*.jar")
     except Exception as e:
         logging.critical(f"Could not find dependency JARs: {e}")
         exit(1)
 
-    classpath = [project_jar] + dependency_jars
+    classpath = [str(project_jar_path)] + dependency_jars
 
     logging.info("Starting JVM...")
     jpype.startJVM(classpath=classpath)
