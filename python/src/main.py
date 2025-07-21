@@ -147,6 +147,7 @@ def main():
                 sys.exit(1)
         IpXactVersion = jpype.JClass("org.example.IpXactVersion")
 
+        component = None
         address_blocks: list[Any] = []
         all_registers: dict[str, list[Any]] = {}
 

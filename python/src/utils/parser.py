@@ -118,14 +118,14 @@ def process_address_map_sheet(df: pl.DataFrame, object_factory: Any) -> list[Any
         try:
             base_address = object_factory.createUnsignedLongintExpression()
             base_address.setValue(str(row["OFFSET"]))
-            range = object_factory.createUnsignedPositiveLongintExpression()
-            range.setValue(str(row["RANGE"]))
+            block_range = object_factory.createUnsignedPositiveLongintExpression()
+            block_range.setValue(str(row["RANGE"]))
             width = object_factory.createUnsignedIntExpression()
             width.setValue("32")
             address_block = object_factory.createAddressBlockType()
             address_block.setName(str(row["BLOCK"]))
             address_block.setBaseAddress(base_address)
-            address_block.setRange(range)
+            address_block.setRange(block_range)
             address_block.setWidth(width)
             address_blocks.append(address_block)
         except KeyError as e:
