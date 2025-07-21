@@ -1,6 +1,6 @@
 [project]
 name = "ipxact_register_generator"
-version = "0.5.0"
+version = "0.6.0"
 description = "convert register description spreadsheets into IP-XACT XML files."
 license = {file = "../LICENSE"}
 readme = {file = "../README.md", content-type = "text/markdown"}
