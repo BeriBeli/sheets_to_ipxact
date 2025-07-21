@@ -1,6 +1,6 @@
 [project]
-name = "sheets_to_ipxact"
-version = "0.2.0"
+name = "ipxact_register_generator"
+version = "0.2.1"
 description = "convert register description spreadsheets in a specific format into IP-XACT XML"
 license = "MIT"
 readme = "README.md"
@@ -17,10 +17,10 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/BeriBeli/sheets_to_ipxact"
+Repository = "https://github.com/BeriBeli/ipxact-register-generator"
 
 [project.scripts]
-sheets_to_ipxact = "main:main"
+irgen = "main:main"
 
 [tool.uv]
 package = true
