@@ -68,17 +68,17 @@ def setup_arg_parser() -> argparse.ArgumentParser:
         help="Path for the output XML file.",
     )
     parser.add_argument(
-        "--vendor_sheet",
+        "--vendor-sheet",
         default=DEFAULT_VENDOR_SHEET,
         help="Name of the vendor sheet.",
     )
     parser.add_argument(
-        "--address_sheet",
+        "--address-sheet",
         default=DEFAULT_ADDRESS_SHEET,
         help="Name of the address map sheet.",
     )
     parser.add_argument(
-        "--ipxact_version",
+        "--ipxact-version",
         default=DEFAULT_IPXACT_VERSION,
         help="IP-XACT version to use (e.g., 1685-2009, 1685-2014, 1685-2022)",
     )
@@ -108,16 +108,20 @@ def main():
         logging.critical(f"Could not read Excel file '{excel_name}': {e}")
         sys.exit(1)
 
+    project_jar = DEFAULT_JAVA_JAR
     try:
-        project_jar = DEFAULT_JAVA_JAR
         dependency_jars = glob.glob(DEFAULT_JAVA_DEPENDENCY_JARS)
+    except Exception as e:
+        logging.critical(f"Could not find dependency JARs: {e}")
+        exit(1)
 
-        classpath = [project_jar] + dependency_jars
+    classpath = [project_jar] + dependency_jars
 
-        logging.info("Starting JVM...")
-        jpype.startJVM(classpath=classpath)
-        logging.info("JVM Started.")
+    logging.info("Starting JVM...")
+    jpype.startJVM(classpath=classpath)
+    logging.info("JVM Started.")
 
+    try:
         # import Java classes
         ObjectFactory = jpype.JClass("org.example.schema.s1685_2014.ObjectFactory")
         XmlGenerator = jpype.JClass("org.example.XmlGenerator")
@@ -125,7 +129,7 @@ def main():
         logging.info("Java classes imported successfully.")
 
         object_factory = ObjectFactory()
-        match (ipxact_version):
+        match ipxact_version:
             case "1685-2009":    
                 AccessType = jpype.JClass("org.example.schema.s1685_2009.AccessType")
                 ModifiedWriteValueType = jpype.JClass("org.example.schema.s1685_2009.ModifiedWriteValueType")
@@ -139,7 +143,8 @@ def main():
                 ModifiedWriteValueType = jpype.JClass("org.example.schema.s1685_2022.ModifiedWriteValueType")
                 ReadActionType = jpype.JClass("org.example.schema.s1685_2022.ReadActionType")
             case _:
-                logging.error(f"Unsupported IP-XACT version: {ipxact_version}")
+                logging.critical(f"Unsupported IP-XACT version: {ipxact_version}")
+                sys.exit(1)
         IpXactVersion = jpype.JClass("org.example.IpXactVersion")
 
         address_blocks: list[Any] = []
@@ -195,11 +200,17 @@ def main():
         memory_map_list.add(memory_map)
         component.setMemoryMaps(memory_maps)
 
+        logging.info(f"XML file will be generated at: {xml_path}")
         XmlGenerator.generateXml(component, IpXactVersion.fromValue(ipxact_version), xml_path)
 
     except Exception as e:
         logging.critical(f"An error occurred during processing: {e}")
         sys.exit(1)
+    finally:
+        if jpype.isJVMStarted():
+            logging.info("Shutting down JVM...")
+            jpype.shutdownJVM()
+            logging.info("JVM shut down.")
 
 
 if __name__ == "__main__":
