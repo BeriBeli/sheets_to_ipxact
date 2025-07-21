@@ -1,4 +1,4 @@
-# Sheets to IP-XACT
+# IP-XACT REGISTER GENERATOR
 
 This is a Python script designed to convert register description spreadsheets in a specific format into IP-XACT XML files. see `example.xlsx` for an example.
 
@@ -34,7 +34,7 @@ address_sheet = "address_map"
 
 ### Installation and Execution
 
-We provide two recommended setup methods: using the standard `venv` or [uv](https://docs.astral.sh/uv/).
+Two recommended setup methods are provided: using the standard `venv` or [uv](https://docs.astral.sh/uv/).
 
 #### Method 1: Using Python `venv`
 
@@ -62,12 +62,7 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 3. **Run the script:**
 
    ```shell
-   sheets_to_ipxact
-   # options:
-   # -h, --help                     show this help message and exit
-   # -d, --debug                    Enable debug logging.
-   # --excel EXCEL                  Path to the input Excel file
-   # -o OUTPUT, --output OUTPUT     Path for the output XML file.
+   irgen
    ```
    or
    ```shell
@@ -100,20 +95,20 @@ We provide two recommended setup methods: using the standard `venv` or [uv](http
 3. **Run the script:**
 
    ```shell
-   sheets_to_ipxact
-   # options:
-   # -h, --help                     show this help message and exit
-   # -d, --debug                    Enable debug logging.
-   # --excel EXCEL                  Path to the input Excel file
-   # -o OUTPUT, --output OUTPUT     Path for the output XML file.
+   irgen
    ```
    or
    ```shell
    uv run src/main.py
    ```
 
+## LICENSE
+
+[MIT](LICENSE)
 
 ## Warning
-IP-XACT IEEE-1685-2014 standard is not completely implemented by `schema.py`
+1. IP-XACT IEEE-1685-2014 standard is not completely implemented by `schema.py`
 
-For completely implemention, See Branch `java_schema`
+   **For completely implemention, See Branch `java_schema`**
+
+2. The Branch `python schema`'s releases will remain at version 0.2.x.
