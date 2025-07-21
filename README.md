@@ -4,7 +4,7 @@ A Python utility to automatically convert register description spreadsheets into
 
 This script leverages the Eclipse Implementation of [JAXB](https://eclipse-ee4j.github.io/jaxb-ri) to generate the necessary IP-XACT schema bindings. See `example.xlsx` for a sample input file.
 
-> [!WARNING] This tool currently **only supports the IEEE 1685-2014 standard** for IP-XACT.
+> [!WARNING!] This tool currently **only supports the IEEE 1685-2014 standard** for IP-XACT.
 
 ## 🛠️ Getting Started
 
@@ -22,6 +22,8 @@ Make sure you have the following software installed:
 ### Installation & Build
 
 You can build the project using the provided scripts or by following the manual steps.
+
+> [!WARNING!] Ensure that the $JAVA_HOME variable is set in your environment.
 
 #### Method 1: Using Build Scripts
 
