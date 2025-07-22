@@ -2,8 +2,8 @@
 name = "ipxact_register_generator"
 version = "0.6.0"
 description = "convert register description spreadsheets into IP-XACT XML files."
-license = {file = "../LICENSE"}
-readme = {file = "../README.md", content-type = "text/markdown"}
+license = "MIT"
+readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "fastexcel>=0.14.0",
