@@ -1,7 +1,6 @@
 import sys
 import logging
 import argparse
-from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +8,7 @@ import polars as pl
 import fastexcel
 import jpype
 
+from irgen.__version__ import __version__
 from irgen.jpath import get_class_path, get_jvm_path
 from irgen.parser import (
     process_vendor_sheet,
@@ -88,8 +88,7 @@ def main():
     setup_logger_level(args.debug)
 
     if args.version:
-        # __package__ is None when using pyinstaller
-        print(version("irgen"))
+        print(__version__)
         sys.exit(0)
 
     if args.template:
