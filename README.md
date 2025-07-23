@@ -17,7 +17,7 @@ Make sure you have the following software installed:
 - **Python**: `3.10` or newer
 - **Java**: Version `21` (*Tested*)
 - **Maven**: [Apache Maven](https://maven.apache.org/)
-- **(Optional)** **uv**: A fast Python package installer from [Astral](https://docs.astral.sh/uv/)
+- **uv**: A fast Python package installer from [Astral](https://docs.astral.sh/uv/)
 
 ### Installation & Build
 
@@ -86,7 +86,7 @@ Run the generator from the command line using the `irgen` command. Provide the p
 **Example:**
 
 ```shell
-# python/.venv/bin/irgen or python\.venv\Scripts\irgen
+# source irgen/.venv/bin/irgen or .\irgen\.venv\Scripts\irgen
 irgen --excel example.xlsx -o example.xml
 ```
 
