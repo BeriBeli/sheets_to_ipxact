@@ -8,7 +8,6 @@ if (-not (Test-Path -Path "jre" -PathType Container)) {
     pyinstaller -F irgen/src/irgen/main.py `
         --name irgen `
         --paths irgen/src `
-        --copy-metadata irgen `
         --add-data "schema/target/ipxact-schema-1.0.0.jar;jar/" `
         --add-data "schema/target/dependency/*;jar/dependency" `
         --exclude-module pytest `
@@ -21,7 +20,6 @@ else {
     pyinstaller -F irgen/src/irgen/main.py `
         --name irgen `
         --paths irgen/src `
-        --copy-metadata irgen `
         --add-data "jre/;jre/" `
         --add-data "schema/target/ipxact-schema-1.0.0.jar;jar/" `
         --add-data "schema/target/dependency/*;jar/dependency" `
