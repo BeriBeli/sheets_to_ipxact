@@ -48,7 +48,7 @@ If you prefer, follow these steps to build and install the components manually.
 
    ```shell
    # Navigate to the java directory
-   cd java
+   cd schema
    # Clean, package, and copy dependencies
    mvn clean package
    mvn dependency:copy-dependencies
@@ -60,7 +60,7 @@ If you prefer, follow these steps to build and install the components manually.
 
    ```shell
    # Navigate to the python directory
-   cd python
+   cd irgen
    
    # Create and activate a virtual environment (using uv is recommended)
    # For uv:
@@ -95,9 +95,11 @@ irgen --excel example.xlsx -o example.xml
 | Option                   | Alias | Description                                                  | default      |
 | ------------------------ | ----- | ------------------------------------------------------------ | ------------ |
 | `--help`                 | `-h`  | Show the help message and exit.                              |              |
-| `--debug`                | `-d`  | Enable debug logging for detailed output.                    | False        |
-| `--excel <path>`         |       | Path to the input Excel file.                                | example.xlsx |
-| `--output <path>`        | `-o`  | Path for the output XML file.                                | example.xml  |
+| `--version`              | `-v`  | Version.                                                     |              |
+| `--debug`                | `-d`  | Enable debug logging for detailed output.                    |              |
+| `--template`             | `-t`  | Generate a template excel for an example.                    |              |
+| `--excel <path>`         | `-e`  | Path to the input Excel file.                                |              |
+| `--output <path>`        | `-o`  | Path for the output XML file.                                |              |
 | `--vendor-sheet <name>`  |       | Name of the sheet containing vendor extensions.              | version      |
 | `--address-sheet <name>` |       | Name of the sheet containing the address map.                | address_map  |
 | `--ipxact-version <ver>` |       | IP-XACT version (e.g., `1685-2009`, `1685-2014`, `1685-2022`). | 1685-2014    |
