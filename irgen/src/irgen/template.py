@@ -13,16 +13,11 @@ def generate_template():
     vendor_df = pl.DataFrame(
         {
             "TAG": ["VENDOR", "LIBRARY", "NAME", "VERSION", "DESCRIPTION"],
-            "VALUE": ["", "", "", "", ""]
+            "VALUE": ["", "", "", "", ""],
         }
     )
     address_map_df = pl.DataFrame(
-        {
-            "BLOCK": [""],
-            "OFFSET": [""],
-            "RANGE": [""],
-            "DESCRIPTION": [""]
-        }
+        {"BLOCK": [""], "OFFSET": [""], "RANGE": [""], "DESCRIPTION": [""]}
     )
     register_df = pl.DataFrame(
         {
@@ -33,7 +28,7 @@ def generate_template():
             "WIDTH": [""],
             "ATTRIBUTE": [""],
             "DEFAULT": [""],
-            "DESCRIPTION": [""]
+            "DESCRIPTION": [""],
         }
     )
     try:

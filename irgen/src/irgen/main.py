@@ -52,7 +52,7 @@ def setup_arg_parser() -> argparse.ArgumentParser:
         "-t",
         "--template",
         action="store_true",
-        help="Generate a template excel for an example."
+        help="Generate a template excel for an example.",
     )
     parser.add_argument(
         "-e",
@@ -88,7 +88,8 @@ def main():
     setup_logger_level(args.debug)
 
     if args.version:
-        print(version(__package__))
+        # __package__ is None when using pyinstaller
+        print(version("irgen"))
         sys.exit(0)
 
     if args.template:
@@ -113,9 +114,7 @@ def main():
     ipxact_version = str(args.ipxact_version)
 
     if ipxact_version != DEFAULT_IPXACT_VERSION:
-        logging.critical(
-            f"IP-XACT version '{ipxact_version}' is not supported now."
-        )
+        logging.critical(f"IP-XACT version '{ipxact_version}' is not supported now.")
         sys.exit(1)
 
     try:
@@ -144,7 +143,9 @@ def main():
                 sys.exit(1)
             case "1685-2014":
                 AccessType = jpype.JClass("org.ieee.ipxact.v2014.AccessType")
-                ModifiedWriteValueType = jpype.JClass("org.ieee.ipxact.v2014.ModifiedWriteValueType")
+                ModifiedWriteValueType = jpype.JClass(
+                    "org.ieee.ipxact.v2014.ModifiedWriteValueType"
+                )
                 ReadActionType = jpype.JClass("org.ieee.ipxact.v2014.ReadActionType")
             case "1685-2022":
                 logging.critical(
@@ -175,7 +176,11 @@ def main():
                 address_blocks = process_address_map_sheet(df, object_factory)
             else:
                 all_registers[sheet_name] = process_register_sheet(
-                    df, object_factory, AccessType, ModifiedWriteValueType, ReadActionType
+                    df,
+                    object_factory,
+                    AccessType,
+                    ModifiedWriteValueType,
+                    ReadActionType,
                 )
 
         if not component:
@@ -211,7 +216,9 @@ def main():
         component.setMemoryMaps(memory_maps)
 
         logging.info(f"XML file will be generated at: {xml_path}")
-        XmlGenerator.generateXml(component, IpXactVersion.fromValue(ipxact_version), xml_path)
+        XmlGenerator.generateXml(
+            component, IpXactVersion.fromValue(ipxact_version), xml_path
+        )
 
     except Exception as e:
         logging.critical(f"An error occurred during processing: {e}")

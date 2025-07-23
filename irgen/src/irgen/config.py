@@ -1,4 +1,3 @@
-import json
 
 DEBUG = False
 LOG_FILE = "debug.log"

@@ -12,7 +12,8 @@ def get_access_value(access: str) -> str:
             return "read-only"
         case _:
             raise KeyError
-    
+
+
 def get_modified_write_value(access: str) -> str | None:
     match access:
         case "RW":
@@ -27,6 +28,7 @@ def get_modified_write_value(access: str) -> str | None:
             return None
         case _:
             raise KeyError
+
 
 def get_read_action_value(access: str) -> str | None:
     match access:

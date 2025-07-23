@@ -182,19 +182,25 @@ def process_register_sheet(
                 field.setName(str(field_row["FIELD"]))
                 field.setBitOffset(bit_offset)
                 field.setBitWidth(bit_width)
-                if (access_value := get_access_value(str(field_row["ATTRIBUTE"]))) is not None:
+                if (
+                    access_value := get_access_value(str(field_row["ATTRIBUTE"]))
+                ) is not None:
                     field.setAccess(AccessType.fromValue(access_value))
-                if (modified_write_value := get_modified_write_value(
-                    str(field_row["ATTRIBUTE"])
-                )) is not None:
+                if (
+                    modified_write_value := get_modified_write_value(
+                        str(field_row["ATTRIBUTE"])
+                    )
+                ) is not None:
                     modified_write = object_factory.createFieldTypeModifiedWriteValue()
-                    modified_write.setValue(ModifiedWriteValueType.fromValue(
-                        modified_write_value
-                    ))
+                    modified_write.setValue(
+                        ModifiedWriteValueType.fromValue(modified_write_value)
+                    )
                     field.setModifiedWriteValue(modified_write)
-                if (read_action_value := get_read_action_value(
-                    str(field_row["ATTRIBUTE"])
-                )) is not None:
+                if (
+                    read_action_value := get_read_action_value(
+                        str(field_row["ATTRIBUTE"])
+                    )
+                ) is not None:
                     read_action = object_factory.createFieldTypeReadAction()
                     read_action.setValue(ReadActionType.fromValue(read_action_value))
                     field.setReadAction(read_action)
