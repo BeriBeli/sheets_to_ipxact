@@ -112,8 +112,8 @@ def main():
     address_sheet = str(args.address_sheet)
     ipxact_version = str(args.ipxact_version)
 
-    if ipxact_version != DEFAULT_IPXACT_VERSION:
-        logging.critical(f"IP-XACT version '{ipxact_version}' is not supported now.")
+    if ipxact_version not in ["1685-2009", "1685-2014", "1685-2022"]:
+        logging.critical(f"Unsupported IP-XACT version: {ipxact_version}!")
         sys.exit(1)
 
     try:
@@ -128,34 +128,23 @@ def main():
         logging.debug("JVM Started.")
 
         # import Java classes
-        ObjectFactory = jpype.JClass("org.ieee.ipxact.v2014.ObjectFactory")
+        match ipxact_version:
+            case "1685-2009":
+                ObjectFactory = jpype.JClass("org.ieee.ipxact.v2009.ObjectFactory")
+            case "1685-2014":
+                ObjectFactory = jpype.JClass("org.ieee.ipxact.v2014.ObjectFactory")
+            case "1685-2022":
+                ObjectFactory = jpype.JClass("org.ieee.ipxact.v2022.ObjectFactory")
+            case _:
+                logging.critical(f"Unsupported IP-XACT version: {ipxact_version}")
+                sys.exit(1)
+
         XmlGenerator = jpype.JClass("org.example.XmlGenerator")
+        IpXactVersion = jpype.JClass("org.example.IpXactVersion")
 
         logging.debug("Java classes imported successfully.")
 
         object_factory = ObjectFactory()
-        match ipxact_version:
-            case "1685-2009":
-                logging.critical(
-                    f"IP-XACT version '{ipxact_version}' is not supported now."
-                )
-                sys.exit(1)
-            case "1685-2014":
-                AccessType = jpype.JClass("org.ieee.ipxact.v2014.AccessType")
-                ModifiedWriteValueType = jpype.JClass(
-                    "org.ieee.ipxact.v2014.ModifiedWriteValueType"
-                )
-                ReadActionType = jpype.JClass("org.ieee.ipxact.v2014.ReadActionType")
-            case "1685-2022":
-                logging.critical(
-                    f"IP-XACT version '{ipxact_version}' is not supported now."
-                )
-                sys.exit(1)
-            case _:
-                logging.critical(f"Unsupported IP-XACT version: {ipxact_version}")
-                sys.exit(1)
-        IpXactVersion = jpype.JClass("org.example.IpXactVersion")
-
         component = None
         address_blocks: list[Any] = []
         all_registers: dict[str, list[Any]] = {}
@@ -172,14 +161,12 @@ def main():
             if sheet_name == vendor_sheet:
                 component = process_vendor_sheet(df, object_factory)
             elif sheet_name == address_sheet:
-                address_blocks = process_address_map_sheet(df, object_factory)
+                address_blocks = process_address_map_sheet(
+                    df, object_factory, ipxact_version
+                )
             else:
                 all_registers[sheet_name] = process_register_sheet(
-                    df,
-                    object_factory,
-                    AccessType,
-                    ModifiedWriteValueType,
-                    ReadActionType,
+                    df, object_factory, ipxact_version
                 )
 
         if not component:
@@ -193,7 +180,10 @@ def main():
         logging.info("Assembling final component structure...")
         for block in address_blocks:
             if block.getName() in all_registers:
-                register_list = block.getRegisterData()
+                if ipxact_version != "1685-2009":
+                    register_list = block.getRegisterData()
+                else:
+                    register_list = block.getRegister()
                 for reg in all_registers[block.getName()]:
                     register_list.add(reg)
                 logging.info(
