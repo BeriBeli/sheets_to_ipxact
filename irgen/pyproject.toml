@@ -1,6 +1,6 @@
 [project]
 name = "irgen"
-version = "0.6.0"
+version = "0.6.1"
 description = "convert register description spreadsheets into IP-XACT XML files."
 license = "MIT"
 readme = "../README.md"
@@ -10,6 +10,7 @@ dependencies = [
     "jpype1",
     "mypy",
     "polars",
+    "pyinstaller",
     "pytest",
     "ruff",
     "xlsxwriter",
@@ -20,9 +21,6 @@ Repository = "https://github.com/BeriBeli/ipxact-register-generator"
 
 [project.scripts]
 irgen = "irgen.main:main"
-
-[tool.uv]
-package = true
 
 [build-system]
 requires = ["hatchling"]
