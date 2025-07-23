@@ -204,6 +204,8 @@ def process_register_sheet(
         fields: list[Any] = []
         first_row = group.row(0, named=True)
 
+        total_field_reset = 0
+
         for field_row in group.iter_rows(named=True):
             try:
                 bit_match = re.findall(r"\[(?:\d+:)?(\d+)]", str(field_row["BIT"]))
@@ -296,8 +298,9 @@ def process_register_sheet(
                     reset_list = resets.getReset()
                     reset_list.add(reset)
                     field.setResets(resets)
-
                 fields.append(field)
+
+                total_field_reset += int(field_row["DEFAULT"], 16) << int(bit_match[0])
             except (KeyError, ValueError, TypeError) as e:
                 logging.error(
                     f"Skipping invalid field '{field_row.get('FIELD', 'N/A')}' in register '{reg_name[0]}': {e}"
@@ -321,6 +324,12 @@ def process_register_sheet(
             else:
                 register.setAddressOffset(str(first_row["ADDR"]))
             register.setSize(register_size)
+            if ipxact_version == "1685-2009":
+                reg_reset = object_factory.createRegisterFileRegisterReset()
+                reg_reset_value = object_factory.createRegisterFileRegisterResetValue()
+                reg_reset_value.setValue(hex(total_field_reset))
+                reg_reset.setValue(reg_reset_value)
+                register.setReset(reg_reset)
             field_list = register.getField()
             for field in fields:
                 field_list.add(field)
