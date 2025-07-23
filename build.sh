@@ -12,12 +12,12 @@ if ! command -v mvn &> /dev/null; then
     exit 1
 fi
 
-if [ ! -d "java"]; then
-    echo "java directory not found."
+if [ ! -d "schema"]; then
+    echo "schema directory not found."
     exit 1
 fi
 
-cd java
+cd schema
 
 # clean and package the java project
 
@@ -40,12 +40,12 @@ fi
 
 cd -
 
-if [ ! -d "python"]; then
-    echo "python directory not found."
+if [ ! -d "irgen"]; then
+    echo "irgen directory not found."
     exit 1
 fi
 
-cd python
+cd irgen
 
 if command -v uv &> /dev/null; then
     uv venv

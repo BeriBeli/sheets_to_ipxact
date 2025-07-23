@@ -18,7 +18,7 @@ if (-not (Get-Command mvn -ErrorAction SilentlyContinue)) {
     Handle-Error "Maven is not installed. Please install Maven to proceed."
 }
 
-$javaDir = "java"
+$javaDir = "schema"
 if (-not (Test-Path -Path $javaDir -PathType Container)) {
     Handle-Error "'$javaDir' directory not found."
 }
@@ -42,7 +42,7 @@ finally {
     Pop-Location
 }
 
-$pythonDir = "python"
+$pythonDir = "irgen"
 if (-not (Test-Path -Path $pythonDir -PathType Container)) {
     Handle-Error "'$pythonDir' directory not found."
 }
