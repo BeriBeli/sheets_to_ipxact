@@ -4,6 +4,11 @@ A Python utility to automatically convert register description spreadsheets into
 
 This script leverages the Eclipse Implementation of [JAXB](https://eclipse-ee4j.github.io/jaxb-ri) to generate the necessary IP-XACT schema bindings. See `example.xlsx` for a sample input file.
 
+> _Additional information for `example.xlsx`_
+> 1. **Hexadecimal** uses "**0x**" as a **prefix**, **decimal** does **not have a prefix**, and the use of **'h** and **'d** to denote numbers in Verilog/SystemVerilog is **prohibited**
+> 2. Multiple register groups are denoted as "**rega{n}, n=0~3**" to represent **rega_0**, **rega_1**, **rega_2**, **rega_3**
+> 3. Default registers are **32 bits**
+
 ## 🛠️ Getting Started
 
 Follow these instructions to get the project up and running on your local machine.
@@ -135,4 +140,3 @@ xmllint --format <your_output.xml> -o <formatted_output.xml>
 ## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
