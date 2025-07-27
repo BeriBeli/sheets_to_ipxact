@@ -10,6 +10,7 @@ dependencies = [
     "jpype1",
     "mypy",
     "polars",
+    "pydantic",
     "pyinstaller",
     "pytest",
     "ruff",
@@ -28,3 +29,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.version]
 path = "src/irgen/__version__.py"
+
+[[tool.uv.index]]
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
+default = true
